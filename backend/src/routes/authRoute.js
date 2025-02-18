@@ -18,13 +18,11 @@ router.post("/register", async (req, res) => {
       industry,
       contactDetails,
     });
-    console.log(user);
     await user.save();
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    res.status(201).json({ token });
-    res.status(201).json({ message: "User registered successfully" });
+    res.status(201).json({ token, message: "User registered successfully" });
   } catch (error) {
     res.status(500).json({ message: `Error registering user: ${error.message}` });
   }
@@ -33,7 +31,6 @@ router.post("/register", async (req, res) => {
 router.get("/users", async (req, res) => {
   try {
     const users = await User.find();
-    console.log(users);
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: "Error fetching users" });
