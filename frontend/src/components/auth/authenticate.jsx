@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { registerUser, loginUser } from "../../redux/slices/authSlice";
 
 const Authentication = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -16,8 +17,10 @@ const Authentication = () => {
     });
     const [errors, setErrors] = useState({ email: "", password: "" });
     const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
+
+    const dispatch = useDispatch();
+    const { loading, error } = useSelector((state) => state.auth);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -57,23 +60,19 @@ const Authentication = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
         setSuccessMessage("");
 
         // Validate required fields
         if (!formData.email || !formData.password) {
-            setIsLoading(false);
             alert("Please fill in all required fields.");
             return;
         }
 
         if (!isLogin && formData.password !== formData.confirmPassword) {
-            setIsLoading(false);
             alert("Passwords do not match!");
             return;
         }
 
-        // Prepare the data to send to the backend
         const userData = {
             email: formData.email,
             password: formData.password,
@@ -86,11 +85,11 @@ const Authentication = () => {
         };
 
         try {
-            // Send a POST request using Axios
-            const response = await axios.post("/api/auth/register", userData);
-            console.log(response);
-
-            if (response.status === 201) {
+            if (isLogin) {
+                await dispatch(loginUser(userData)).unwrap();
+                setSuccessMessage("Login successful! ✅");
+            } else {
+                await dispatch(registerUser(userData)).unwrap();
                 setSuccessMessage("Account created successfully! ✅");
                 setFormData({
                     email: "",
@@ -105,9 +104,7 @@ const Authentication = () => {
                 });
             }
         } catch (error) {
-            alert(error.response?.data?.message || "Registration failed. Please try again.");
-        } finally {
-            setIsLoading(false);
+            alert(error.message || "Authentication failed. Please try again.");
         }
     };
 
@@ -127,8 +124,9 @@ const Authentication = () => {
                 <div className="mb-4 text-green-600 font-medium">{successMessage}</div>
             )}
 
+            {error && <div className="mb-4 text-red-500 font-medium">{error}</div>}
+
             <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-                {/* Email Field */}
                 <div className="relative">
                     <input
                         type="email"
@@ -145,7 +143,6 @@ const Authentication = () => {
                     )}
                 </div>
 
-                {/* Password Field */}
                 <div className="relative">
                     <input
                         type={showPassword ? "text" : "password"}
@@ -168,7 +165,6 @@ const Authentication = () => {
                     )}
                 </div>
 
-                {/* Confirm Password Field (for Sign Up) */}
                 {!isLogin && (
                     <div className="relative">
                         <input
@@ -183,7 +179,6 @@ const Authentication = () => {
                     </div>
                 )}
 
-                {/* Business Name Field (for Sign Up) */}
                 {!isLogin && (
                     <div className="relative">
                         <input
@@ -198,7 +193,6 @@ const Authentication = () => {
                     </div>
                 )}
 
-                {/* Industry Field (for Sign Up) */}
                 {!isLogin && (
                     <div className="relative">
                         <input
@@ -213,7 +207,6 @@ const Authentication = () => {
                     </div>
                 )}
 
-                {/* Contact Details: Phone Field (for Sign Up) */}
                 {!isLogin && (
                     <div className="relative">
                         <input
@@ -227,7 +220,6 @@ const Authentication = () => {
                     </div>
                 )}
 
-                {/* Contact Details: Address Field (for Sign Up) */}
                 {!isLogin && (
                     <div className="relative">
                         <input
@@ -241,22 +233,21 @@ const Authentication = () => {
                     </div>
                 )}
 
-                {/* Submit Button */}
                 <button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={loading}
                     className={`w-full py-2 text-white font-semibold rounded-md transition duration-300 ${
-                        isLoading
+                        loading
                             ? "bg-gray-400 cursor-not-allowed"
                             : "bg-blue-600 hover:bg-blue-700"
                     }`}
                 >
-                    {isLoading ? "Processing..." : isLogin ? "Log In" : "Sign Up"}
+                    {loading ? "Processing..." : isLogin ? "Log In" : "Sign Up"}
                 </button>
             </form>
 
             {/* Loading Spinner */}
-            {isLoading && (
+            {loading && (
                 <div className="flex justify-center mt-4">
                     <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
                 </div>

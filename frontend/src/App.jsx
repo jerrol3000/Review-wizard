@@ -1,13 +1,15 @@
 import React from "react";
-import Dashboard from "./components/dashboards/Dashboard";
-import Authentication from "./components/auth/authenticate";
-function App() {
+import AppRoutes from "./Routes/Routes";
+import Navbar from "./components/Navbar";
+// import NavBar from "./components/NavBar";
+
+const App = () => {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Authentication />
-      <Dashboard />
+    <div>
+      <Navbar />
+      <AppRoutes />
     </div>
   );
-}
+};
 
 export default App;
