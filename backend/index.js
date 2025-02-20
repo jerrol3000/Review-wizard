@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require("./src/db/db");
 const authRoutes = require('./src/routes/authRoute');
+const path = require('path');
 
 dotenv.config();
 
@@ -13,6 +14,11 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+
+// remove later
+app.get('/api/seed', (req, res) => {
+  res.sendFile(path.join(__dirname, 'seed_data.json'));
+});
 
 // Connect to MongoDB
 connectDB();
