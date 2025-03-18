@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require("./src/db/db");
 const authRoutes = require('./src/routes/authRoute');
+const airesponseRoute = require('./src/routes/airesponseRoute');
 const path = require('path');
 
 dotenv.config();
@@ -14,6 +15,8 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/airesponse', airesponseRoute);
+
 
 // remove later
 app.get('/api/seed', (req, res) => {
