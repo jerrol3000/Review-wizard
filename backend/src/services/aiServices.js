@@ -17,7 +17,6 @@ async function generateResponse(reviewText) {
           { role: "user", content: reviewText },
         ],
         temperature: 0.7,
-        max_tokens: 100,
       },
       {
         headers: {
